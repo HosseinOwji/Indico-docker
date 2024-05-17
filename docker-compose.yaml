@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: indico
+      POSTGRES_PASSWORD: indico
+      POSTGRES_DB: indico
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:latest
+    restart: always
+
+  indico:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - indico_data:/opt/indico
+    environment:
+      - http_proxy=http://proxy.charite.de:8080
+      - https_proxy=http://proxy.charite.de:8080
+    restart: always
+
+volumes:
+  postgres_data:
+  indico_data:
